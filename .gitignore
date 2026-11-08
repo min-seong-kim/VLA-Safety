@@ -1,0 +1,85 @@
+# Datasets, downloaded checkpoints, and generated evaluation output.
+/data/
+/data_raw/
+/data_eval/
+/checkpoints/
+/runs/
+/logs/
+
+# Local dependency clone and installed tool binaries (manage separately).
+/openpi/
+/tools/uv
+/tools/uvx
+
+# Python environments and installed packages.
+/envs/
+.venv/
+venv/
+env/
+__pypackages__/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Download, framework, compiler, and test caches.
+.cache/
+cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+htmlcov/
+
+# Model weights and container images saved outside the directories above.
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.model
+*.onnx
+*.sif
+*.sqsh
+
+# Experiment tracking, Slurm output, and crash dumps.
+wandb/
+mlruns/
+tensorboard/
+events.out.tfevents.*
+*.log
+slurm-*.out
+slurm-*.err
+core
+core.[0-9]*
+*.core
+
+# Local credentials and agent/editor settings. Keep example env files.
+.env
+.env.*
+!.env.example
+!.env.sample
+/.aws/
+/.agents/
+/.codex/
+/.claude/
+.vscode/
+.idea/
+
+# Temporary and operating-system files.
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Keep source, job scripts, configs, documentation, and doc/assets/ tracked.
+# Do not ignore JSON/JSONL, CSV, images, or PDFs globally.

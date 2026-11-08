@@ -1,0 +1,16 @@
+model,dataset,old_source,canonical_source,old_lm_accuracy,canonical_lm_accuracy,old_probe_accuracy,canonical_probe_accuracy,reason
+pi0,sqa_img_mc,backbone_eval_v1,backbone_eval_v2_checkpoints,0.358,0.358,0.372,0.377,cached probe convergence repair
+openvla,pope_yn,backbone_eval_v1,backbone_eval_v2_checkpoints,0.52,0.519,0.66,0.663,matched singleton HF reevaluation
+openvla,mme_yn,backbone_eval_v1,backbone_eval_v2_checkpoints,0.5084388185654009,0.4978902953586498,0.540084388185654,0.5506329113924051,matched singleton HF reevaluation
+openvla,sqa_img_mc,backbone_eval_v1,backbone_eval_v2_checkpoints,0.348,0.354,0.385,0.391,matched singleton HF reevaluation
+openvla,vqav2_mc,backbone_eval_v1,backbone_eval_v2_checkpoints,0.346,0.343,0.319,0.325,matched singleton HF reevaluation
+openvla,coco_capchoice,backbone_eval_v1,backbone_eval_v2_checkpoints,0.264,0.263,0.277,0.271,matched singleton HF reevaluation
+openvla,vlguard_request,backbone_eval_v1,backbone_eval_v2_checkpoints,0.386,0.389,0.905,0.902,matched singleton HF reevaluation
+openvla,siuo_mcqa,backbone_eval_v1,backbone_eval_v2_checkpoints,0.21875,0.21875,0.15625,0.1875,matched singleton HF reevaluation
+openvla_oft,pope_yn,backbone_eval_v1,backbone_eval_v2_checkpoints,0.515,0.515,0.526,0.563,matched singleton HF reevaluation
+openvla_oft,mme_yn,backbone_eval_v1,backbone_eval_v2_checkpoints,0.5,0.5,0.5253164556962026,0.5295358649789029,matched singleton HF reevaluation
+openvla_oft,sqa_img_mc,backbone_eval_v1,backbone_eval_v2_checkpoints,0.354,0.354,0.364,0.362,matched singleton HF reevaluation
+openvla_oft,vqav2_mc,backbone_eval_v1,backbone_eval_v2_checkpoints,0.36,0.36,0.336,0.332,matched singleton HF reevaluation
+openvla_oft,coco_capchoice,backbone_eval_v1,backbone_eval_v2_checkpoints,0.242,0.242,0.234,0.244,matched singleton HF reevaluation
+openvla_oft,vlguard_request,backbone_eval_v1,backbone_eval_v2_checkpoints,0.364,0.364,0.769,0.779,matched singleton HF reevaluation
+openvla_oft,siuo_mcqa,backbone_eval_v1,backbone_eval_v2_checkpoints,0.25,0.25,0.21875,0.21875,matched singleton HF reevaluation
