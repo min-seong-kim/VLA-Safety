@@ -37,7 +37,3 @@ Project scripts have no dedicated automated suite or coverage threshold. Run syn
 ## Commit & Pull Request Guidelines
 
 The root has no Git history. Upstream commits use short descriptive subjects, sometimes scoped prefixes such as `docs(droid):`, and PR numbers. Use concise imperative subjects. PR descriptions should explain changes, affected checkpoints/benchmarks, validation commands, and result differences; link relevant issues and reports.
-
-## Cluster & Configuration Rules
-
-Before executing code in this environment, read and follow [HANGANG_AGENT_GUIDE.md](/scratch/t512a07/minseong/HANGANG_AGENT_GUIDE.md). Apply its procedures to environment setup, data processing, testing, evaluation, training, and Slurm job management. Submit through Slurm on `natStr` with the required job comment; keep compute off login nodes. Record every submission in `runs/submitted-jobs.tsv`. Keep environments and caches local. The account is shared: inspect and cancel only your recorded job IDs.

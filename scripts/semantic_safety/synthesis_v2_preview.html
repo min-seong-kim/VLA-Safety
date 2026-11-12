@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semantic Safety v2 · 상황 합성 명세</title>
+<style>
+:root{color-scheme:light;--ink:#172d36;--muted:#5d7078;--line:#d8e2e2;--paper:#f4f7f6;--teal:#126d65}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Noto Sans KR",sans-serif}
+button,input,select{font:inherit}button,select{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #54a9bd;outline-offset:3px}
+button{border:1px solid var(--line);border-radius:8px;background:white;padding:8px 12px;color:var(--ink)}button:hover{background:#edf5f3}
+header{padding:34px max(24px,calc((100vw - 1320px)/2));background:#173a43;color:#f6fbf9}
+.eyebrow{font-size:12px;letter-spacing:.13em;color:#a4d6cb;font-weight:700}h1{font-size:clamp(25px,4vw,36px);line-height:1.35;margin:8px 0 12px}header p{margin:0;max-width:900px;color:#d5e4e3}
+main{max-width:1370px;padding:24px;margin:auto}.notice{background:#fff8e9;border:1px solid #e9d6ae;padding:16px 20px;border-radius:10px;margin-bottom:20px}.notice strong{color:#76531e}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}.stat{padding:16px 20px;background:white;border:1px solid var(--line);border-radius:10px}.stat b{display:block;font-size:28px;line-height:1.3}.stat span{color:var(--muted);font-size:13px}
+.workspace{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}.sidebar{position:sticky;top:16px;padding:16px;border:1px solid var(--line);background:white;border-radius:12px}
+label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin:8px 0 5px}input,select{width:100%;padding:9px 10px;border:1px solid #b8cccd;border-radius:7px;background:white;color:var(--ink);min-width:0}.small{font-size:12px;color:var(--muted)}
+#familyList{margin-top:12px;display:grid;gap:6px;max-height:52vh;overflow:auto;padding-right:4px}.family-button{text-align:left;border-color:transparent;padding:10px 12px;line-height:1.45}.family-button.active{background:#e7f3ef;border-color:#64a398;color:#145d55}.family-button small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.panel{min-width:0}h2{font-size:23px;margin:0 0 8px;line-height:1.4}h3{font-size:17px;margin:0 0 12px}.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}.tag{font-size:11px;padding:3px 8px;border-radius:5px;background:#e8eeef;color:#345561;overflow-wrap:anywhere}.tag.split{background:#dfebe5;color:#28583f}
+.rule{padding:16px 18px;background:#e7efed;border-left:3px solid var(--teal);margin-bottom:18px;border-radius:0 8px 8px 0}.rule p{margin:0}.rule .small{margin-top:6px}
+.case{background:white;border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}.case summary{padding:16px 18px;cursor:pointer;font-weight:650}.case summary small{font-weight:400;color:var(--muted);margin-left:10px}.case-content{padding:0 18px 20px}.entities{color:var(--muted);font-size:13px;margin:0 0 14px;overflow-wrap:anywhere}.context{padding:13px 15px;background:#f0f4f5;border-radius:8px;margin-bottom:12px;overflow-wrap:anywhere}.context b{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}.context p{margin:0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.task{padding:14px 16px;border-radius:8px;border:1px solid #b7d6ca;background:#f4faf6;overflow-wrap:anywhere}.task.unsafe{border-color:#e0c4bf;background:#fff8f6}.task .label{font-size:11px;font-weight:800;letter-spacing:.05em;color:#22694f}.task.unsafe .label{color:#985346}.task p{margin:8px 0 0}.case-note{font-size:11px;color:var(--muted);margin-top:12px}
+.bottom{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px}.box{border:1px solid var(--line);border-radius:10px;padding:22px;background:white;min-width:0}.box p{margin:10px 0}.box ul{padding-left:20px}.box li{margin:7px 0}a{color:#0e716e;text-underline-offset:3px}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.empty{padding:48px 20px;background:white;border:1px solid var(--line);border-radius:10px;text-align:center;color:var(--muted)}
+footer{max-width:1370px;margin:20px auto;padding:0 24px 30px;color:var(--muted);font-size:12px}code{font-size:12px;overflow-wrap:anywhere}.fold-counts{margin-top:8px}
+@media(max-width:850px){.workspace{grid-template-columns:1fr}.sidebar{position:static}#familyList{max-height:230px;grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}.bottom{grid-template-columns:1fr}.pair{grid-template-columns:1fr}}
+@media(max-width:480px){main{padding:14px}header{padding:24px 16px}.stats{gap:8px;grid-template-columns:repeat(2,1fr)}.stat{padding:12px 14px}.stat b{font-size:24px}#familyList{grid-template-columns:1fr}.case-content{padding:0 12px 16px}.case summary{padding:14px 12px}h2{font-size:21px}.notice{padding:12px 14px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">VLA REPRESENTATION RESEARCH / CATALOG v2</div><h1>시점보다 상황을 늘리기</h1><p>물체·행동·대상·상태의 관계로 구성한 명시적 안전 / 위험 지시 쌍. 상황군을 넘어 일반화하는 probe를 위한 합성 명세입니다.</p></header>
+<main>
+<div class="notice"><strong>생성 명세입니다. 신규 RGB 관측은 아직 0개입니다.</strong><br>지시는 작성했지만 장면 렌더링과 독립적인 라벨 검수는 수행하지 않았습니다. 아래 수량을 완성된 이미지 데이터셋의 크기로 해석하지 마세요. 기존 v1의 6개 상황은 카메라·배치 변화에 대한 보조 평가용입니다.</div>
+<div class="stats" id="stats"></div>
+<div class="workspace">
+<aside class="sidebar" aria-label="상황 검색">
+<label for="category">위험 범주</label><select id="category"><option value="all">전체 범주</option></select>
+<label for="search">상황 · 물체 · 지시 검색</label><input id="search" type="search" placeholder="예: infant, 배터리, knife">
+<label for="fold">위험 원리 단위 분할 제안</label><select id="fold"></select><div class="small fold-counts" id="foldCounts"></div>
+<div class="small" id="resultCount" aria-live="polite"></div><nav id="familyList" aria-label="상황군 목록"></nav>
+<div class="actions"><button id="export">현재 필터의 명세 저장</button></div>
+</aside>
+<section class="panel" id="panel" aria-live="polite"></section>
+</div>
+<div class="bottom">
+<section class="box"><h3>무엇을 다양성으로 셀 것인가</h3><p>범주 → 위험 원리 → 상황군 → 구체적인 물체·대상 조합 → 배치·카메라 순으로 구분합니다. 108개 대조쌍은 108개 독립 원리가 아닙니다.</p><ul><li>같은 쌍은 장면·공통 조건을 공유하고 행동의 첫 동사를 맞췄습니다.</li><li>안전 예시에도 칼 사용, 망치 사용, 켜진 스토브 조리를 포함했습니다.</li><li>1개 canonical 배치와 1개 주 카메라를 기본으로 계획합니다. 시점 증강은 별도 보조 평가에 둡니다.</li><li>25개 원리 그룹은 수작업 분류입니다. 겹치는 더 넓은 개념이 없다는 보증은 아닙니다.</li></ul></section>
+<section class="box"><h3>probe 해석과 현재 진단</h3><div id="audit"></div><p>명시적 지시는 언어만으로도 판단할 수 있습니다. 높은 probe 점수는 “위험 관련 정보의 선형 판독 가능성”을 지지할 수 있지만, 시각 정보 사용이나 AE의 경고 활용을 증명하지 않습니다.</p><p class="small">train에서만 scaler/PCA/LDA/probe를 fit하고 test를 보고 layer·threshold를 선택하지 않습니다. t-SNE 분리도 자체를 일반화 성능으로 쓰지 않습니다.</p></section>
+<section class="box"><h3>라벨을 결정하는 조건</h3><p><b>실제 입력 = 공통 상황 설명 + 해당 지시.</b> 알레르기, 통전, 온도, 보존 의도 등이 metadata에만 남으면 라벨이 불명확해집니다. 여기서는 두 라벨에 같은 공통 상황 설명을 제공합니다.</p><p>텍스트로 제공한 상태를 영상에서 확인했다고 주장하지 않습니다. 독립적인 검수에서 애매한 사례는 uncertain / exclude로 분리하고, 실제 렌더링과 검수가 끝난 뒤 split을 고정합니다.</p></section>
+<section class="box"><h3>참고 방법과 범위</h3><div id="sources"></div><p class="small">6개 범주는 연구 목적에 맞춘 분류이며 ISO 공식 분류나 인증이 아닙니다. AutoRT의 배포 환경별 도구 사용 금지를 그대로 라벨로 사용하지 않았습니다. 개인정보 노출은 별도 확장으로 남겼습니다.</p></section>
+</div>
+</main>
+<footer>이 HTML은 데이터·스타일·스크립트를 내장합니다. 파일 하나만 내려받아 브라우저로 열 수 있으며 서버가 필요하지 않습니다. 파일명·범주·라벨·위험 근거는 모델 입력에 넣지 않습니다.</footer>
+<script id="catalog-data" type="application/json">__DATA__</script>
+<script>
+"use strict";
+const DATA = JSON.parse(document.querySelector('#catalog-data').textContent);
+window.CATALOG_V2 = DATA;
+const el = id => document.getElementById(id);
+const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let currentFamily = DATA.pairs[0].family_id;
+const families = [...new Map(DATA.pairs.map(p => [p.family_id, p])).values()];
+const stats = [[DATA.summary.families,'상황군'],[DATA.summary.mechanism_groups,'위험 원리 그룹'],[DATA.summary.contrast_pairs,'대조쌍 후보'],[DATA.summary.instruction_candidates,'지시 후보'],[0,'신규 RGB 관측']];
+el('stats').innerHTML = stats.map(([n,label]) => `<div class="stat"><b>${n}</b><span>${label}</span></div>`).join('');
+for (const [key,title] of Object.entries(DATA.summary.categories)) {
+  const option = document.createElement('option');option.value=key;option.textContent=`${title} · ${DATA.summary.families_per_category[key]} 상황군`;el('category').append(option);
+}
+for (const fold of DATA.mechanism_protocol.folds) {
+  const option=document.createElement('option');option.value=fold.fold;option.textContent=`Fold ${fold.fold+1} / 6`;el('fold').append(option);
+}
+function filteredPairs(){const q=el('search').value.trim().toLowerCase();return DATA.pairs.filter(p => (el('category').value==='all'||p.category===el('category').value)&&(!q||JSON.stringify(p).toLowerCase().includes(q)));}
+function splitFor(pair){const f=DATA.mechanism_protocol.folds[Number(el('fold').value)];return f.test_pairs.includes(pair.pair_id)?'test':f.validation_pairs.includes(pair.pair_id)?'validation':'train';}
+function render(){
+  const pairs=filteredPairs();const ids=new Set(pairs.map(p=>p.family_id));const matches=families.filter(f=>ids.has(f.family_id));
+  if(!ids.has(currentFamily))currentFamily=matches[0]?.family_id;
+  el('resultCount').textContent=`${matches.length}개 상황군 · ${pairs.length}개 대조쌍`;
+  el('familyList').replaceChildren();
+  for(const f of matches){const b=document.createElement('button');b.className='family-button'+(f.family_id===currentFamily?' active':'');b.dataset.family=f.family_id;b.setAttribute('aria-pressed',f.family_id===currentFamily);b.innerHTML=`${escapeHtml(f.title_ko)}<small>${escapeHtml(DATA.summary.categories[f.category])} · ${splitFor(f)}</small>`;b.addEventListener('click',()=>{currentFamily=f.family_id;render();});el('familyList').append(b);}
+  const fold=DATA.mechanism_protocol.folds[Number(el('fold').value)];el('foldCounts').textContent=`대조쌍: train ${fold.train_pairs.length} / validation ${fold.validation_pairs.length} / test ${fold.test_pairs.length}`;
+  if(!matches.length){el('panel').innerHTML='<div class="empty">검색 결과가 없습니다.</div>';return;}
+  const f=matches.find(x=>x.family_id===currentFamily);const cases=pairs.filter(p=>p.family_id===currentFamily);
+  el('panel').innerHTML=`<h2>${escapeHtml(f.title_ko)}</h2><div class="tags"><span class="tag">${escapeHtml(DATA.summary.categories[f.category])}</span><span class="tag">원리: ${escapeHtml(f.mechanism_group)}</span><span class="tag split">${splitFor(f)}</span><span class="tag">렌더링 전 · 검수 전</span></div><div class="rule"><p>${escapeHtml(f.causal_rule_ko)}</p><p class="small">원리는 라벨 검토용 설명입니다. 모델 입력에는 넣지 않습니다.</p></div>`;
+  cases.forEach((p,i)=>{
+    const node=document.createElement('details');node.className='case';node.open=i===0;node.dataset.pair=p.pair_id;
+    node.innerHTML=`<summary>구체화 ${p.pair_id.split('__').pop()}<small>${escapeHtml(p.contrast_axis)} 대조</small></summary><div class="case-content"><p class="entities"><b>함께 렌더링할 물체:</b> ${p.entities.map(escapeHtml).join(' · ')}</p><div class="context"><b>공통 상황 설명 · 양쪽 모델 입력에 동일하게 포함</b><p>${escapeHtml(p.shared_context)}</p></div><div class="pair"><div class="task"><span class="label">SAFE · 제안 라벨</span><p>${escapeHtml(p.safe_request)}</p></div><div class="task unsafe"><span class="label">UNSAFE · 제안 라벨</span><p>${escapeHtml(p.unsafe_request)}</p></div></div><div class="case-note">동일한 실제 관측을 연결할 예정입니다. 현재 이미지·로봇 상태는 없습니다. <code>${escapeHtml(p.pair_id)}</code></div></div>`;
+    el('panel').append(node);
+  });
+}
+el('category').addEventListener('change',render);el('search').addEventListener('input',render);el('fold').addEventListener('change',render);
+el('export').addEventListener('click',()=>{const blob=new Blob([filteredPairs().map(p=>JSON.stringify(p)).join('\n')+'\n'],{type:'application/x-ndjson'});const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download='semantic_safety_scene_blueprints.jsonl';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);});
+el('sources').innerHTML=DATA.sources.map(s=>`<p><a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(s.title)}</a></p>`).join('');
+if(DATA.audit.status.startsWith('completed')){const r=DATA.audit.results.instruction;el('audit').innerHTML=`<p><b>단어 TF-IDF + logistic regression</b><br>원리 그룹을 분리한 6-fold에서, 공통 설명을 포함한 지시의 OOF balanced accuracy는 <b>${(r.pooled_oof_balanced_accuracy*100).toFixed(1)}%</b>, fold 평균 AUROC는 <b>${r.mean_fold_auroc.toFixed(3)}</b>입니다.</p><p class="small">합성 텍스트 후보의 어휘 진단입니다. VLA probe 결과가 아니며, 이 값만으로 편향 유무를 판정할 수 없습니다.</p>`;}else el('audit').textContent='어휘 진단은 실행하지 않았습니다.';
+render();
+</script>
+</body>
+</html>

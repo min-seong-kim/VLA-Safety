@@ -1,0 +1,48 @@
+{
+  "role": "render",
+  "python": "3.12.3",
+  "prefix": "/NHNHOME/26msit001_B/BASE/edge_ai_lab/minseong/VLA-Safety/envs/libero-render",
+  "versions": {
+    "torch": "2.10.0a0+b4e4ee81d3.nv25.12",
+    "mujoco": "3.2.2",
+    "numpy": "1.26.4",
+    "scipy": "1.16.3",
+    "numba": "0.63.1",
+    "h5py": "3.16.0",
+    "PyOpenGL": "3.1.10"
+  },
+  "simulator_sources": {
+    "robosuite": "/NHNHOME/26msit001_B/BASE/edge_ai_lab/minseong/VLA-Safety/third_party/robosuite_vanilla/robosuite/__init__.py",
+    "libero_benchmark": "/NHNHOME/26msit001_B/BASE/edge_ai_lab/minseong/VLA-Safety/third_party/libero/libero/libero/benchmark/__init__.py"
+  },
+  "smoke": {
+    "main_rgb_sha256": "1af6d1371f6ab8eb865f57ff43d9f329820919270f3bc3b1aa1dcbb6f5959a7e",
+    "wrist_rgb_sha256": "efa77391c4b8dce2f42ea680aeb6337ebc177dde934fbd59dcad1adf0468d1f6",
+    "replay_steps": 196,
+    "max_sim_state_abs_error": 0.0,
+    "replay_success": true,
+    "native_initial_states": {
+      "libero_spatial": {
+        "state_sha256": "266152174edb0eabca50fafe65a4102525e1bbefe6a1b860e348ef43378fbecf",
+        "main_rgb_sha256": "4f72245ecee3d3b2582ea5551185211d5cd269a399abad109cda1be0e1be373a",
+        "wrist_rgb_sha256": "fba2b6351bad2025b37a79a38a66c75595402a0985661ef8aaaec99c351dd32f"
+      },
+      "libero_object": {
+        "state_sha256": "84c895615683d1a7ece3cfa30ba58b8aa1f777194477b92f9fc52baceab819dd",
+        "main_rgb_sha256": "7de3275185d31255e443585cb2a3be4b87896f82b81e1b8a207b63c39f40a1b3",
+        "wrist_rgb_sha256": "46b3b18542792fbea96e909b814dca2dcb39b7c7212bd7ee6ad06ab0330b23cc"
+      },
+      "libero_goal": {
+        "state_sha256": "62d0c227794bf7c78fb3c4bb53a6fad6e9114c88af3331b668efae17ad3bf268",
+        "main_rgb_sha256": "22f8f7ef813117676e98126d1b696d9750fbaeb302e42cb9c7b05153eb60ef6c",
+        "wrist_rgb_sha256": "899e28dfb1291752697aece7c7b0cd9d217ac35650794b2be4a5c42a3a3af42e"
+      },
+      "libero_10": {
+        "state_sha256": "0e3b31d80227ccfc85d492c5995e153adce0b1940e0cb0b4923f343c9630445f",
+        "main_rgb_sha256": "a59f13bb423029ad0255ffdf94927f59d94fc54d8e043ab615867b1d07e270ef",
+        "wrist_rgb_sha256": "a61ebf80a8fd0b96b6d2fc5ff0609b1a340601f61cc37dfbb685e2dd4f91ab4d"
+      }
+    }
+  },
+  "passed": true
+}

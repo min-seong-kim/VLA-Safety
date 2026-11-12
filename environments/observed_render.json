@@ -1,0 +1,315 @@
+{
+  "role": "render",
+  "python": "3.12.3",
+  "platform": "Linux-6.8.0-100-generic-x86_64-with-glibc2.39",
+  "packages": [
+    {
+      "name": "absl-py",
+      "version": "2.3.1",
+      "direct_url": null
+    },
+    {
+      "name": "attrs",
+      "version": "25.4.0",
+      "direct_url": null
+    },
+    {
+      "name": "bddl",
+      "version": "1.0.1",
+      "direct_url": null
+    },
+    {
+      "name": "cloudpickle",
+      "version": "3.1.2",
+      "direct_url": null
+    },
+    {
+      "name": "contourpy",
+      "version": "1.3.3",
+      "direct_url": null
+    },
+    {
+      "name": "cycler",
+      "version": "0.12.1",
+      "direct_url": null
+    },
+    {
+      "name": "easydict",
+      "version": "1.14",
+      "direct_url": null
+    },
+    {
+      "name": "etils",
+      "version": "1.15.0",
+      "direct_url": null
+    },
+    {
+      "name": "fastjsonschema",
+      "version": "2.21.2",
+      "direct_url": null
+    },
+    {
+      "name": "filelock",
+      "version": "3.20.1",
+      "direct_url": null
+    },
+    {
+      "name": "fonttools",
+      "version": "4.61.1",
+      "direct_url": null
+    },
+    {
+      "name": "fsspec",
+      "version": "2025.10.0",
+      "direct_url": null
+    },
+    {
+      "name": "future",
+      "version": "1.0.0",
+      "direct_url": null
+    },
+    {
+      "name": "glfw",
+      "version": "2.11.0",
+      "direct_url": null
+    },
+    {
+      "name": "gym",
+      "version": "0.25.2",
+      "direct_url": null
+    },
+    {
+      "name": "gym-notices",
+      "version": "0.1.0",
+      "direct_url": null
+    },
+    {
+      "name": "h5py",
+      "version": "3.16.0",
+      "direct_url": null
+    },
+    {
+      "name": "imageio",
+      "version": "2.38.1",
+      "direct_url": null
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.0",
+      "direct_url": null
+    },
+    {
+      "name": "jinja2",
+      "version": "3.1.6",
+      "direct_url": null
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.25.1",
+      "direct_url": null
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "direct_url": null
+    },
+    {
+      "name": "jupyter-core",
+      "version": "5.9.1",
+      "direct_url": null
+    },
+    {
+      "name": "jupytext",
+      "version": "1.18.1",
+      "direct_url": null
+    },
+    {
+      "name": "kiwisolver",
+      "version": "1.4.9",
+      "direct_url": null
+    },
+    {
+      "name": "llvmlite",
+      "version": "0.46.0",
+      "direct_url": null
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.0.0",
+      "direct_url": null
+    },
+    {
+      "name": "markupsafe",
+      "version": "3.0.3",
+      "direct_url": null
+    },
+    {
+      "name": "matplotlib",
+      "version": "3.10.8",
+      "direct_url": null
+    },
+    {
+      "name": "mdit-py-plugins",
+      "version": "0.5.0",
+      "direct_url": null
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2",
+      "direct_url": null
+    },
+    {
+      "name": "mpmath",
+      "version": "1.3.0",
+      "direct_url": null
+    },
+    {
+      "name": "mujoco",
+      "version": "3.2.2",
+      "direct_url": null
+    },
+    {
+      "name": "nbformat",
+      "version": "5.10.4",
+      "direct_url": null
+    },
+    {
+      "name": "networkx",
+      "version": "3.6.1",
+      "direct_url": null
+    },
+    {
+      "name": "numba",
+      "version": "0.63.1",
+      "direct_url": null
+    },
+    {
+      "name": "numpy",
+      "version": "1.26.4",
+      "direct_url": null
+    },
+    {
+      "name": "opencv-python-headless",
+      "version": "4.11.0.86",
+      "direct_url": null
+    },
+    {
+      "name": "packaging",
+      "version": "25.0",
+      "direct_url": null
+    },
+    {
+      "name": "pillow",
+      "version": "12.0.0",
+      "direct_url": null
+    },
+    {
+      "name": "platformdirs",
+      "version": "4.5.1",
+      "direct_url": null
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0",
+      "direct_url": null
+    },
+    {
+      "name": "psutil",
+      "version": "7.1.3",
+      "direct_url": null
+    },
+    {
+      "name": "pyopengl",
+      "version": "3.1.10",
+      "direct_url": null
+    },
+    {
+      "name": "pyparsing",
+      "version": "3.2.5",
+      "direct_url": null
+    },
+    {
+      "name": "pytest",
+      "version": "8.1.1",
+      "direct_url": null
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "direct_url": null
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "direct_url": null
+    },
+    {
+      "name": "referencing",
+      "version": "0.37.0",
+      "direct_url": null
+    },
+    {
+      "name": "rpds-py",
+      "version": "0.30.0",
+      "direct_url": null
+    },
+    {
+      "name": "scipy",
+      "version": "1.16.3",
+      "direct_url": null
+    },
+    {
+      "name": "setuptools",
+      "version": "80.9.0",
+      "direct_url": null
+    },
+    {
+      "name": "six",
+      "version": "1.16.0",
+      "direct_url": null
+    },
+    {
+      "name": "sympy",
+      "version": "1.14.0",
+      "direct_url": null
+    },
+    {
+      "name": "termcolor",
+      "version": "3.3.0",
+      "direct_url": null
+    },
+    {
+      "name": "torch",
+      "version": "2.10.0a0+b4e4ee81d3.nv25.12",
+      "direct_url": {
+        "archive_info": {
+          "hash": "sha256=f4951a7100ee9e38e9ee497b31524f71597a8f16edfaee66735a03bda61e4af7",
+          "hashes": {
+            "sha256": "f4951a7100ee9e38e9ee497b31524f71597a8f16edfaee66735a03bda61e4af7"
+          }
+        },
+        "url": "file:///opt/transfer/torch-2.10.0a0%2Bb4e4ee81d3.nv25.12-40345937-cp312-cp312-linux_x86_64.whl"
+      }
+    },
+    {
+      "name": "traitlets",
+      "version": "5.14.3",
+      "direct_url": null
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.15.0",
+      "direct_url": null
+    },
+    {
+      "name": "wheel",
+      "version": "0.45.1",
+      "direct_url": null
+    },
+    {
+      "name": "zipp",
+      "version": "3.23.0",
+      "direct_url": null
+    }
+  ]
+}

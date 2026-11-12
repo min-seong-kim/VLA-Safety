@@ -1,0 +1,107 @@
+{
+  "created_at_utc": "2026-11-12T12:23:38.545002+00:00",
+  "passed": true,
+  "installation": {
+    "manager": "micromamba 2.10.0 (Conda-compatible solver and isolated conda-meta prefixes)",
+    "platform": "linux-64",
+    "original_environments_preserved": true,
+    "final_spec_adjustments_installed_and_checked": [
+      "training c-compiler and make",
+      "torchcodec===0.4.0 (avoid alternate +cu128 build)",
+      "renderer future==1.0.0 (undeclared bddl runtime dependency)"
+    ]
+  },
+  "hardware": {
+    "gpu": "NVIDIA B200",
+    "driver": "580.95.05"
+  },
+  "package_versions": {
+    "train": {
+      "compared_packages": 207,
+      "exact_matches": 207,
+      "intentional_differences": [],
+      "pip_check_passed": true
+    },
+    "render": {
+      "compared_packages": 60,
+      "exact_matches": 59,
+      "intentional_differences": [
+        {
+          "name": "torch",
+          "original": "2.10.0a0+b4e4ee81d3.nv25.12",
+          "conda": "2.7.1+cpu"
+        }
+      ],
+      "pip_check_passed": true
+    }
+  },
+  "training_inference_comparison": {
+    "item_id": "train__c000__0000",
+    "action_shape": [
+      10,
+      7
+    ],
+    "max_absolute_difference": 0.0,
+    "sha256_identical": true,
+    "checkpoint": "checkpoints/pi05_libero_pytorch",
+    "optimizer_updates": 0
+  },
+  "simulator_comparison": {
+    "item_id": "train__c000__0000",
+    "replay_steps": 196,
+    "max_sim_state_abs_error_vs_saved_demonstration": 0.0,
+    "replay_success": true,
+    "main_and_wrist_rgb_identical": true,
+    "native_initial_state_checks": [
+      {
+        "suite": "libero_spatial",
+        "task_id": 0,
+        "initial_state_id": 0,
+        "state_sha256_identical": true,
+        "main_and_wrist_rgb_identical": true
+      },
+      {
+        "suite": "libero_object",
+        "task_id": 0,
+        "initial_state_id": 0,
+        "state_sha256_identical": true,
+        "main_and_wrist_rgb_identical": true
+      },
+      {
+        "suite": "libero_goal",
+        "task_id": 0,
+        "initial_state_id": 0,
+        "state_sha256_identical": true,
+        "main_and_wrist_rgb_identical": true
+      },
+      {
+        "suite": "libero_10",
+        "task_id": 0,
+        "initial_state_id": 0,
+        "state_sha256_identical": true,
+        "main_and_wrist_rgb_identical": true
+      }
+    ]
+  },
+  "source_python_files_unchanged": 349,
+  "limitations": [
+    "Fixed-input baseline policy and one stored demonstration were tested; full LoRA retraining and the 676/80 episode evaluations were not repeated.",
+    "Different GPU/driver and relocated absolute asset paths require separate validation.",
+    "Renderer uses the documented public CPU PyTorch substitute instead of the unavailable original NVIDIA development wheel."
+  ],
+  "files_sha256": {
+    "environment.yml": "3315f4bfeb7937799b0f4b8eb2d1e6a79e4ebf315ba6844b2713364299a1c25f",
+    "environment-render.yml": "5e70ad082f391bec86996e9984b87963443978d16386be65952bd5ce97a10333",
+    "scripts/setup_conda_environment.py": "813ea9853f8b75d7902996ef311f20b98dc7b9fd81cbde1991e45c4eef0a4f45",
+    "scripts/check_conda_environment.py": "bdd3d9792a4dcc25ce167eece384df1e78abd5a8938103ebc72b4ae7efcea6f1",
+    "environments/train-pip.txt": "74c54b05033f2e57ff58fe87c44b8e1d4afc14f4440ec9a2b403a535d4d5f9eb",
+    "environments/render-pip.txt": "7ad2c0941ad96d93549dc3ac77a9a668a9994355d1b348735318a69275b86d7b",
+    "environments/source-state.json": "e13c67a9cd52cec7b8278872d164501972ebf8dd646d0e675e187445b4e92178"
+  },
+  "detail_reports": [
+    "validation-original-train.json",
+    "validation-conda-train.json",
+    "validation-original-render.json",
+    "validation-conda-render.json"
+  ]
+}

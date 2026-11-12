@@ -81,5 +81,9 @@ core.[0-9]*
 .DS_Store
 Thumbs.db
 
+
+/third_party/
+MUJOCO_LOG.TXT
+
 # Keep source, job scripts, configs, documentation, and doc/assets/ tracked.
 # Do not ignore JSON/JSONL, CSV, images, or PDFs globally.
