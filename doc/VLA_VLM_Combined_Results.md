@@ -157,6 +157,7 @@ POPE의 v1 보조 집계에는 중복 문항 ID 문제가 있어 통합 이미�
 
 ## 7. 원본과 재현 자료
 
+- [후속 실험: VLGuard probe 재학습 및 LIBERO 안전·위험 환경 전이 평가](VLGuard_to_LIBERO_Transfer_Results.md): source에서 새로 학습한 두 probe를 고정해 676개 초기 관찰에 평가했다. 아래의 역사적 결과와 구분한다.
 - [통합 주 결과 CSV: 77개 조합, 출처 포함](assets/vla_vlm_combined/canonical_results.csv)
 - [이전 실행까지 포함한 92개 결과](assets/vla_vlm_combined/all_runs.csv) / [변경된 15개 항목](assets/vla_vlm_combined/historical_vs_canonical.csv)
 - [기존 실험 설명](VLA_VLM_Utility_Safety_Explained.md) / [추가 체크포인트 결과](VLA_VLM_Checkpoint_Expansion_Results.md)

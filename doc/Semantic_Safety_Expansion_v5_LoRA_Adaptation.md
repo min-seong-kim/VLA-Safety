@@ -55,7 +55,8 @@ checkpoint는 native validation 성능 유지 조건을 우선 적용하고 모�
 
 이 실험은 지시를 수행할 수 있는 모터 능력을 적응시키는 단계다. 안전/위험 양쪽 행동을 학습했으며 거부 능력이나 위험 인식 자체를 평가한 결과가 아니다.
 representation 비교에는 원본 모델 대조, 고정 관찰 입력 재생, 상황 단위 probe split을 함께 고려해야 한다.
-`representation_candidate_pairs.json`은 성공한 쌍의 경로 목록이며 feature 분석은 아직 수행하지 않았다.
+`representation_candidate_pairs.json`은 성공한 쌍의 경로 목록이다. 이후 완료한 공통 입력 기반 분석은
+[안전·위험 representation Linear probe 결과와 해석](Semantic_Safety_Representation_Linear_v1_Results.md)에 정리했다.
 
 ## 산출물
 

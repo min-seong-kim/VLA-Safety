@@ -38,6 +38,11 @@ def inspect_milestones(run):
     def add(key, title, evidence, result=None):
         events[key] = {"id": key, "title": title, "evidence": str(evidence), "result": result}
 
+    for path in sorted((run / "milestones").glob("*.json")):
+        milestone = read_json(path) or {}
+        if milestone.get("complete") is True and milestone.get("title"):
+            add("milestone:" + path.stem, milestone["title"], path, milestone.get("result"))
+
     ready = read_json(run / "experiment_data_ready.json") or {}
     if ready.get("full_data_audit_passed") is True:
         add("data_ready", "학습 시연 준비 및 전체 검증 완료", run / "experiment_data_ready.json")
@@ -92,6 +97,41 @@ def inspect_milestones(run):
     return events
 
 
+def reported_event_ids(run):
+    """Use foreground reports as well as callbacks to suppress stale notifications."""
+    reported = set()
+    folder = run / "reporting"
+    for path in (folder / "reported").glob("*.json"):
+        receipt = read_json(path) or {}
+        if receipt.get("reported") is False:
+            continue
+        events = receipt.get("events")
+        if events is None:
+            packet = read_json(folder / "events" / path.name) or {}
+            events = packet.get("events", [])
+        reported.update(event if isinstance(event, str) else event["id"] for event in events)
+    return reported
+
+
+def acknowledge_report(run, event_ids):
+    """Record an actual user-facing report without queueing an acknowledgement."""
+    folder = run / "reporting"
+    folder.mkdir(parents=True, exist_ok=True)
+    with (folder / "lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        events = inspect_milestones(run)
+        assert set(event_ids) <= events.keys(), "Only existing, verified events can be acknowledged"
+        path = folder / "state.json"
+        state = json.loads(path.read_text()) if path.exists() else {"events": {}}
+        for event_id in event_ids:
+            state["events"][event_id] = {"state": "reported", "updated_unix": time.time()}
+        write_json(path, state)
+        write_json(folder / "reported" / ("manual_" + uuid.uuid4().hex + ".json"), {
+            "reported": True, "received_by": "foreground_report", "events": list(event_ids),
+            "reported_in_active_turn": True, "updated_unix": time.time()})
+    return {"state": "acknowledged_without_message", "events": len(event_ids)}
+
+
 def report_once(run, *, config_path=CONFIG, initialize=False, sender=subprocess.run):
     """Queue each milestone at most once; record ambiguous delivery without resending."""
     config = read_json(config_path) or {}
@@ -109,6 +149,17 @@ def report_once(run, *, config_path=CONFIG, initialize=False, sender=subprocess.
         # A malformed delivery ledger must never be replaced with an empty one.
         state = json.loads(state_path.read_text()) if state_path.exists() else {"events": {}}
         events = inspect_milestones(run)
+        reported = reported_event_ids(run)
+        for event_id in reported:
+            state["events"][event_id] = {"state": "reported", "updated_unix": time.time()}
+        # A final report already covers older completion and recovery milestones.
+        terminal = all((read_json(run / name) or {}).get("state") == "complete"
+                       for name in ("experiment_status.json", "pipeline_status.json"))
+        if "experiment_complete" in reported and terminal:
+            for event_id in events:
+                if not event_id.startswith(("error:", "attention:", "pause:")):
+                    state["events"].setdefault(event_id, {"state": "covered_by_final_report"})
+        write_json(state_path, state)
         unseen = [value for key, value in events.items() if key not in state["events"]]
         if initialize:
             for event in unseen:
@@ -116,7 +167,16 @@ def report_once(run, *, config_path=CONFIG, initialize=False, sender=subprocess.
             write_json(state_path, state)
             return {"state": "initialized", "previously_reported_events": len(unseen)}
         if not unseen:
+            write_json(folder / "pending.json", {"events": []})
             return {"state": "no_new_milestones"}
+        mode = (read_json(folder / "delivery_mode.json") or {}).get(
+            "mode", config.get("delivery_mode", "foreground"))
+        if mode == "foreground":
+            # The active assistant reports directly. Do not enqueue delayed duplicate turns.
+            write_json(folder / "pending.json", {"events": unseen, "updated_unix": time.time()})
+            return {"state": "deferred_to_foreground", "events": len(unseen)}
+        assert mode == "background", f"Unknown notification delivery mode: {mode}"
+        write_json(folder / "pending.json", {"events": []})
         packet_id = uuid.uuid4().hex
         packet_path = folder / "events" / (packet_id + ".json")
         write_json(packet_path, {"packet_id": packet_id, "run_dir": str(run), "thread_id": thread,
@@ -124,13 +184,24 @@ def report_once(run, *, config_path=CONFIG, initialize=False, sender=subprocess.
         for event in unseen:
             state["events"][event["id"]] = {"state": "dispatching", "packet": str(packet_path)}
         write_json(state_path, state)
+        autonomous_recovery = (read_json(run / "experiment_protocol.json") or {}).get("autonomous_recovery_authorized") is True
+        recovery_instruction = (
+            "사용자는 이 실행의 오류 수정과 동일 프로토콜의 재개·후속 단계 자동 진행을 승인했습니다. "
+            "미해결 오류가 있으면 기존 실행을 복구하고 이어가세요. 실행 중인 감독 프로세스가 있으면 중복 실행하지 마세요. "
+            "새 VLA 학습, LDA, 새 데이터 조건이나 실험 범위 확장은 시작하지 마세요. 이 메시지를 다시 큐에 넣지 마세요. "
+        ) if autonomous_recovery else (
+            "이 호출은 상태 보고만 요청하며, 새 학습·평가·추가 실험을 시작하거나 이 메시지를 다시 큐에 넣지 마세요. "
+        )
         prompt = (
             "[사용자가 요청한 실험 단계 자동 보고] "
             f"이벤트 파일: {packet_path}\n"
+            "사용자에게 말하기 전에 보고 이력을 먼저 확인하세요. 이미 보고한 packet 또는 event이거나, "
+            "전체 완료를 이미 보고한 실험의 과거 단계이면 조용히 종료하세요. "
+            "중복인 경우 진행 안내·수신 확인·기록 갱신 안내·최종 답변을 포함해 어떤 사용자 메시지도 남기지 마세요. "
             "이 파일과 근거 파일의 현재 상태를 확인하고, 새로 완료된 단계·핵심 결과·남은 단계를 한국어로 짧게 보고하세요. "
             "진행률만 반복 보고하지 마세요. 오류 이벤트는 현재 복구 여부를 확인해 함께 설명하세요. "
             "이미 보고한 packet이면 반복하지 마세요. 보고 전 reporting/reported/<packet_id>.json에 확인 기록을 남기세요. "
-            "이 호출은 상태 보고만 요청하며, 새 학습·평가·추가 실험을 시작하거나 이 메시지를 다시 큐에 넣지 마세요. "
+            + recovery_instruction +
             "이미 사용자가 중지/변경을 요청했다면 최신 지시를 따르세요."
         )
         command = [config.get("codex_command", "codex"), "queue", "--thread", thread,
@@ -170,12 +241,21 @@ def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--initialize", action="store_true", help="Mark existing milestones already reported; send nothing")
+    parser.add_argument("--delivery-mode", choices=["foreground", "background"],
+                        help="Foreground defers callbacks; background queues only unreported events")
+    parser.add_argument("--acknowledge", nargs="+", metavar="EVENT_ID",
+                        help="Record event IDs already reported directly; send no message")
     parser.add_argument("--watch", action="store_true", help="Watch until complete, paused, or requiring attention")
     parser.add_argument("--interval", type=float, default=60)
     args = parser.parse_args()
     run = args.run_dir.resolve()
     assert run.is_dir(), "Run directory must already exist"
     assert args.interval >= 10, "Avoid frequent filesystem polling"
+    if args.delivery_mode:
+        write_json(run / "reporting/delivery_mode.json", {"mode": args.delivery_mode, "updated_unix": time.time()})
+    if args.acknowledge:
+        print(json.dumps(acknowledge_report(run, args.acknowledge)))
+        return
     if args.initialize:
         print(json.dumps(report_once(run, initialize=True)))
         return
