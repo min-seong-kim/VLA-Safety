@@ -4,7 +4,9 @@
 AE/VLM/Both LoRA 학습, 모델 추론, 새 환경 676개 및 기존 LIBERO 80개 평가다.
 Linux x86_64와 NVIDIA GPU를 기준으로 한다.
 
-## 환경을 두 개로 나눈 이유
+최근 CPU probe용 환경과 현재 서버에서 재검증한 범위는 [실험 재현 안내](../doc/2026-11-18_Experiment_Reproducibility.md)에 있다.
+
+## 학습과 렌더 환경을 나눈 이유
 
 | 용도 | Conda 파일 / 이름 | 주요 버전 |
 | --- | --- | --- |
@@ -59,7 +61,7 @@ YAML은 코드·데이터·가중치를 다운로드하거나 복사하지 않�
 - `checkpoints/pi05_libero_pytorch/`: 기반 가중치와 정규화 통계.
 - `checkpoints/pi05_libero_expansion_v5_lora_v1/`: 최종 `ae`, `vlm`, `all` adapter. adapter만으로는 추론할 수 없다.
 - `.cache/openpi/big_vision/paligemma_tokenizer.model`: 실제 사용한 tokenizer. 없으면 첫 실행에서 다운로드하므로 오프라인 서버에는 이 파일도 복사한다.
-- 중단 학습을 재개하려면 `runs/semantic_expansion_v5_lora_v1/`의 optimizer/RNG 상태와 학습 기록도 필요하다.
+- 중단 학습을 재개하려면 `runs/semantic_expansion_v5_lora_v1/`의 optimizer·adapter·step 상태와 학습 기록도 필요하다.
 
 LeRobot은 YAML에서 Git commit `0cf864870cf29f4738d3ade893e6fd13fbd7cdb5`로 고정했다.
 `observed_train.json`, `observed_render.json`은 원래 환경의 설치 기록이다.

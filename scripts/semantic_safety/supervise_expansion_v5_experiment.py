@@ -205,7 +205,7 @@ def main():
         experiment=read_json(RUN/"experiment_status.json", {})
         if experiment.get("state")=="complete":
             assert read_json(RUN/"pipeline_status.json", {}).get("state")=="complete"
-            assert (ROOT/"doc/Semantic_Safety_Expansion_v5_LoRA_Adaptation.md").exists()
+            assert (ROOT/"doc/2026-11-12_Semantic_Safety_Expansion_v5_LoRA_Adaptation.md").exists()
             assert all((ROOT/"checkpoints/pi05_libero_expansion_v5_lora_v1"/s/"adapter.pt").exists() for s in ["ae","vlm","all"])
             write_json(RUN/"supervisor_status.json",dict(state="complete",updated_unix=time.time(),restarts=len(history)))
             return

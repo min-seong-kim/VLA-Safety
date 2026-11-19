@@ -80,5 +80,5 @@ def write_docs(summary):
               "원본 v4, feedback 파일, 기존 v6 실험과 모델은 수정하지 않았다.", ""]
     report="\n".join(lines)
     for name in ["README.md","revision_report.md"]:(OUT/name).write_text(report)
-    (ROOT/"doc/Semantic_Safety_Expansion_v5_Feedback.md").write_text(report)
-    (ROOT/"doc/Semantic_Safety_Observation_Expansion_v5.md").write_text(report)
+    (ROOT/"doc/2026-11-11_Semantic_Safety_Expansion_v5_Feedback.md").write_text(report)
+    (ROOT/"doc/2026-11-11_Semantic_Safety_Observation_Expansion_v5.md").write_text(report)

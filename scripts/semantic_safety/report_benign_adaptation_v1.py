@@ -9,18 +9,54 @@ import joblib
 import numpy as np
 
 import benign_adaptation_v1 as b
-from representation_common import feature_sites
+from representation_common import FLOW_STEPS, feature_sites
 from rollout_common import write_json
 
-MODELS=["base","libero","ae","vlm","all"]
+ADAPTED_MODELS = ("ae", "vlm", "all")
+MODELS = ("base", "libero", *ADAPTED_MODELS)
 NAMES={"base":"π0.5 base","libero":"LIBERO FT","ae":"AE-only","vlm":"VLM-only","all":"Both"}
-PRIMARY=["vlm/layer_17","ae/flow_10/layer_17","velocity_pre/flow_10","velocity_post/flow_10"]
 
 
-def main():
+def plot_layer_auroc(all_metrics, path):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+
+    layers = range(18)
+    flow_styles = {
+        1: ("#0072b2", "-", "o"),
+        5: ("#b55600", "--", "s"),
+        10: ("#008060", "-.", "^"),
+    }
+    fig, axes = plt.subplots(2, 3, figsize=(12, 6.6), sharex=True, sharey=True)
+    for row, track in enumerate(("A", "B")):
+        for col, model in enumerate(ADAPTED_MODELS):
+            ax = axes[row, col]
+            vlm = [all_metrics[model, track, f"vlm/layer_{i:02d}"]["fold_mean_AUROC"] for i in layers]
+            ax.plot(layers, vlm, label="VLM", color="#676b73", linestyle=":", linewidth=1.8)
+            for step in FLOW_STEPS:
+                values = [all_metrics[model, track, f"ae/flow_{step:02d}/layer_{i:02d}"]["fold_mean_AUROC"]
+                          for i in layers]
+                color, style, marker = flow_styles[step]
+                ax.plot(layers, values, label=f"AE flow {step}", color=color, linestyle=style,
+                        linewidth=1.8, marker=marker, markevery=[0, 6, 12, 17], markersize=4)
+            ax.set(xlim=(-0.3, 17.3), ylim=(0.48, 1.0), xticks=[0, 3, 6, 9, 12, 15, 17],
+                   yticks=[0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+            ax.grid(axis="y", alpha=0.22)
+            ax.spines[["top", "right"]].set_visible(False)
+            if row == 0:
+                ax.set_title(NAMES[model], fontweight="bold")
+            if col == 0:
+                ax.set_ylabel(f"Track {track}\nMean test AUROC")
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, handlelength=3)
+    fig.supxlabel("Residual layer", y=0.02)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.94))
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+
+
+def main():
     out=b.RUN/"report";out.mkdir(exist_ok=True)
     protocol=json.loads((b.RUN/"experiment_protocol.json").read_text())
     data=json.loads((b.DATA/"training_data_audit.json").read_text())
@@ -77,17 +113,7 @@ def main():
     write_json(out/"validation_selected_sites.json",selected)
     with (out/"all_sites.csv").open("w",newline="") as stream:
         writer=csv.DictWriter(stream,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
-    fig,axes=plt.subplots(2,2,figsize=(13,9),sharex=True,sharey=True)
-    for r,track in enumerate(["A","B"]):
-        for c,prefix in enumerate(["vlm/layer_","ae/flow_10/layer_"]):
-            ax=axes[r,c]
-            for model in MODELS:
-                values=[all_metrics[model,track,prefix+f"{layer:02d}"]["fold_mean_AUROC"] for layer in range(18)]
-                ax.plot(range(18),values,label=NAMES[model],linewidth=1.7)
-            ax.axhline(.5,ls="--",c="gray",lw=1);ax.set_ylim(.35,1.01);ax.grid(alpha=.2)
-            ax.set_title(f"Track {track}: "+("VLM" if c==0 else "AE / flow 10"));ax.set_xlabel("Layer")
-            ax.set_ylabel("Mean held-out fold AUROC");ax.legend(fontsize=8)
-    fig.tight_layout();fig.savefig(out/"layer_auroc.png",dpi=170);plt.close(fig)
+    plot_layer_auroc(all_metrics, out / "layer_auroc.png")
     assets=b.ROOT/"doc/assets/benign_adaptation_v1";assets.mkdir(parents=True,exist_ok=True)
     import shutil
     shutil.copy2(out/"layer_auroc.png",assets/"layer_auroc.png")
@@ -142,42 +168,61 @@ def main():
         values={kind:json.loads((b.RUN/"final"/scope/kind/"completion.json").read_text()) for kind in ["motor","native"]}
         motor_results[scope]=values
         lines.append(f"| {NAMES.get(scope,'LIBERO FT baseline')} | "+" | ".join(f"{v['successes']}/{v['episodes']} ({v['successes']/v['episodes']:.1%})" for v in values.values())+" |")
+    followup = b.ROOT / "doc/2026-11-18_Semantic_Safety_Benign_Harmful_Rollouts_v1_Results.md"
+    if followup.is_file():
+        lines += ["", f"[같은 세 모델의 식품·위생·물품 손상 요청 수행률]({followup.name})"]
     lines += ["", "## 6. Linear Probe 학습·평가", "",
               "기존 336개 의미 조건, A 336개/B 121개 입력, 첫 장면 이미지·지시·state, 연결 group 20개와 5-fold 분할을 그대로 사용했다. Base와 LIBERO baseline은 완료된 동일 실험의 feature/probe를 읽기 전용으로 재사용했다.",
               "각 적응 모델의 가중치를 freeze하고 78개 위치를 추출했다. VLM 0–17 residual, AE 0–17 residual × flow 1/5/10, 각 flow의 velocity projection 전후다. 같은 초기 noise와 10회 내부 denoising을 사용하며 환경 action은 실행하지 않는다. Token 축에만 mean pooling한다.",
               "각 모델·위치·fold마다 StandardScaler와 L2 logistic probe를 독립적으로 새로 학습했다. train group 크기와 클래스 질량을 보정하는 sample weight를 적용했다. C=0.01/0.1/1 중 validation AUROC로 선택하고 dev를 합쳐 재학습하지 않는다. 판정은 logit≥0이다.",
               "주 AUROC와 balanced accuracy는 5개 test fold의 평균이다. Accuracy·confusion matrix·위험 예측 비율은 모든 OOF test 예측을 합친 값이다. 기존 보고서에 fold별 실제 표본 수와 weighting 수식이 있다.",
-              "[기존 상세 프로토콜](Semantic_Safety_Contrast_Initial_Linear_v1_Results.md)", "",
+              "[기존 상세 프로토콜](2026-11-16_Semantic_Safety_Contrast_Initial_Linear_v1_Results.md)", "",
               "## 7. 주요 위치 결과", "",
-              "표의 AUROC는 fold 평균±표준편차이며 신뢰구간이 아니다. 마지막 layer 결과를 사전에 지정한 주 비교로 사용한다.", ""]
-    for track in ["A","B"]:
-        lines += [f"### Track {track}","","| 모델 | VLM layer17 AUROC | VLM accuracy | AE flow10 layer17 AUROC | AE accuracy |","|---|---:|---:|---:|---:|"]
-        for model in MODELS:
-            a=all_metrics[model,track,PRIMARY[0]];e=all_metrics[model,track,PRIMARY[1]]
-            lines.append(f"| {NAMES[model]} | {a['fold_mean_AUROC']:.3f}±{a['fold_sd_AUROC']:.3f} | {a['oof']['accuracy']:.1%} | {e['fold_mean_AUROC']:.3f}±{e['fold_sd_AUROC']:.3f} | {e['oof']['accuracy']:.1%} |")
-        lines += ["", "| 모델·위치 | balanced accuracy | 위험 예측 비율 | [[TN,FP],[FN,TP]] |", "|---|---:|---:|---|"]
-        for model in MODELS:
-            for site,label in [(PRIMARY[0],"VLM17"),(PRIMARY[1],"AE17/flow10")]:
-                value=all_metrics[model,track,site]
-                lines.append(f"| {NAMES[model]} {label} | {value['fold_mean_balanced_accuracy']:.1%} | {value['oof']['predicted_unsafe_fraction']:.1%} | {value['oof']['confusion_matrix']} |")
+              "### 층별 AUROC와 AE flow step", "",
+              "Flow 1·5·10은 같은 첫 장면에서 action chunk 하나를 생성하는 동안 AE가 수행한 총 10번의 denoising 중 첫 번째, 다섯 번째, 마지막 호출이다. 각 곡선은 0–17층 residual output에서 독립적으로 학습한 probe의 5-fold 평균 test AUROC를 보여준다.", "",
+              "![두 트랙과 세 적응 모델의 VLM 및 AE flow 1·5·10 층별 AUROC](assets/benign_adaptation_v1/layer_auroc.png)", "",
+              "행은 Track A(사실 명시)와 B(관찰 결합 후보), 열은 LoRA로 학습한 모듈을 가리킨다. 예를 들어 VLM-only 열의 AE 곡선은 VLM만 적응시킨 모델의 AE에서 읽은 결과다. 회색 점선은 같은 모델의 VLM이다.", "",
+              "아래 표는 17층을 고정해 세 시점을 비교한다. 사전에 정한 주 비교 위치는 VLM 17층과 AE flow 10의 17층이다. AUROC는 test fold 평균 ± 표준편차, balanced accuracy는 fold 평균이다. Accuracy와 판정 수는 OOF 합산값이며 위험을 양성으로 센다.", ""]
+    last_residuals = [("VLM", "vlm/layer_17")]
+    last_residuals.extend((f"AE · flow {step}", f"ae/flow_{step:02d}/layer_17") for step in FLOW_STEPS)
+    for track in ("A", "B"):
+        lines += [f"### Track {track}", "",
+                  "| 적응 모델 | 17층 위치 | AUROC ± SD | Accuracy | Balanced accuracy | 위험 판정 비율 | TN / FP / FN / TP |",
+                  "|---|---|---:|---:|---:|---:|---|"]
+        for model in ADAPTED_MODELS:
+            for label, site in last_residuals:
+                value = all_metrics[model, track, site]
+                oof = value["oof"]
+                (tn, fp), (fn, tp) = oof["confusion_matrix"]
+                lines.append(
+                    f"| {NAMES[model]} | {label} | {value['fold_mean_AUROC']:.3f} ± {value['fold_sd_AUROC']:.3f} "
+                    f"| {oof['accuracy']:.1%} | {value['fold_mean_balanced_accuracy']:.1%} "
+                    f"| {oof['predicted_unsafe_fraction']:.1%} | {tn} / {fp} / {fn} / {tp} |"
+                )
         lines.append("")
     lines += ["### Velocity projection 전후", "",
-              "아래는 flow 10의 AUROC다. 전/후 차원은 각각 1024/32이며, 수치 차이만으로 위험 경고가 사라졌다고 판단하지 않는다.", "",
-              "| 모델 | A pre | A post | B pre | B post |","|---|---:|---:|---:|---:|"]
-    for model in MODELS:
-        values=[all_metrics[model,track,site]["fold_mean_AUROC"] for track in ["A","B"] for site in PRIMARY[2:]]
-        lines.append(f"| {NAMES[model]} | "+" | ".join(f"{v:.3f}" for v in values)+" |")
+              "각 칸은 같은 flow에서 velocity projection 직전(1,024차원)과 직후(32차원)에 각각 학습한 probe의 평균 test AUROC를 순서대로 보여준다.", "",
+              "| 트랙 | 적응 모델 | Flow 1 (직전 → 직후) | Flow 5 (직전 → 직후) | Flow 10 (직전 → 직후) |",
+              "|---|---|---:|---:|---:|"]
+    for track in ("A", "B"):
+        for model in ADAPTED_MODELS:
+            cells = []
+            for step in FLOW_STEPS:
+                pre = all_metrics[model, track, f"velocity_pre/flow_{step:02d}"]["fold_mean_AUROC"]
+                post = all_metrics[model, track, f"velocity_post/flow_{step:02d}"]["fold_mean_AUROC"]
+                cells.append(f"{pre:.3f} → {post:.3f}")
+            lines.append(f"| {track} | {NAMES[model]} | " + " | ".join(cells) + " |")
     lines += ["", "### Validation으로 위치를 선택한 보조 비교", "",
               "각 fold에서 VLM 18개/AE 54개 후보 중 validation AUROC로 위치를 고른 뒤 해당 test fold 점수를 집계했다. Test에서 가장 높은 위치를 고른 값이 아니며, fold마다 선택 위치가 다를 수 있다. 추가 probe 학습은 없다.", "",
               "| 모델 | A VLM | A AE | B VLM | B AE |","|---|---:|---:|---:|---:|"]
-    for model in MODELS:
+    for model in ADAPTED_MODELS:
         values=[next(v for v in selected if v["model"]==model and v["track"]==track and v["module"]==module)["fold_mean_AUROC"] for track in ["A","B"] for module in ["vlm","ae"]]
         lines.append(f"| {NAMES[model]} | "+" | ".join(f"{v:.3f}" for v in values)+" |")
-    lines += ["", "![Layer별 AUROC](assets/benign_adaptation_v1/layer_auroc.png)","",
-              "## 8. 해석", "",
+    lines += ["", "## 8. 해석", "",
+              "17층에서 세 flow의 평균 AUROC를 비교하면, AE-only는 두 트랙 모두 flow 1에서, Both는 두 트랙 모두 flow 10에서 가장 높았다. VLM-only는 A에서 flow 1, B에서 flow 5가 가장 높았다. 이 순위는 같은 층의 다섯 test fold 평균을 비교한 결과다.", "",
               "AE-only에서 VLM 18개 layer의 feature는 LIBERO baseline과 입력별로 완전히 같음을 확인했다. 따라서 이 비교의 VLM probe 변화는 없어야 한다. AE 측 결과 변화와 분리해 해석한다.", ""]
     for track in ["A","B"]:
-        for module,site in [("VLM",PRIMARY[0]),("AE",PRIMARY[1])]:
+        for module,site in [("VLM 17층","vlm/layer_17"),("AE 17층 · flow 10","ae/flow_10/layer_17")]:
             baseline=all_metrics["libero",track,site]["fold_mean_AUROC"]
             deltas=[f"{NAMES[m]} {all_metrics[m,track,site]['fold_mean_AUROC']-baseline:+.3f}" for m in ["ae","vlm","all"]]
             lines.append(f"- Track {track} {module}의 LIBERO baseline 대비 AUROC 차이: "+", ".join(deltas)+".")
@@ -191,7 +236,7 @@ def main():
               "- [전체 위치 CSV](../runs/semantic_benign_adaptation_v1/report/all_sites.csv)",
               "- [수치·입력 동일성 검증](../runs/semantic_benign_adaptation_v1/report/numerical_audit.json)",
               "- 모델 adapter: `checkpoints/pi05_libero_benign_adaptation_v1/{ae,vlm,all}/adapter.pt`", ""]
-    path=b.ROOT/"doc/Semantic_Safety_Benign_Adaptation_v1_Results.md"
+    path=b.ROOT/"doc/2026-11-17_Semantic_Safety_Benign_Adaptation_v1_Results.md"
     path.write_text("\n".join(lines))
     write_json(out/"summary.json",dict(complete=True,rows=rows,policy_evaluation=motor_results,
                                      validation_selected_sites=selected,document=str(path)))

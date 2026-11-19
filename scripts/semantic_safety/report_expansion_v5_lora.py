@@ -159,10 +159,10 @@ representation 비교에는 원본 모델 대조, 고정 관찰 입력 재생, �
 
 원본 v4와 기존 v6 실험·모델은 유지했다.
 """
-    (ROOT/"doc/Semantic_Safety_Expansion_v5_LoRA_Adaptation.md").write_text(report)
+    (ROOT/"doc/2026-11-12_Semantic_Safety_Expansion_v5_LoRA_Adaptation.md").write_text(report)
     (RUN/"README.md").write_text(report)
     (DATA/"README.md").write_text("# 확장 v5 시연 데이터\n\n"+report.split("## 시연 생성과 검증\n",1)[1].split("## 학습과 선택",1)[0]+
-        "\n전체 방법과 결과: `doc/Semantic_Safety_Expansion_v5_LoRA_Adaptation.md`.\n")
+        "\n전체 방법과 결과: `doc/2026-11-12_Semantic_Safety_Expansion_v5_LoRA_Adaptation.md`.\n")
     (EXPORT/"README.md").write_text("# π0.5 LIBERO 확장 v5 LoRA\n\n원본 checkpoint에 adapter를 추가해 로딩한다. adapter만으로 추론할 수 없다.\n\n"
         "```python\nfrom motor_lora import load_policy\nfrom v6_scoped_lora import load\npolicy, config = load_policy('pi05_libero')\n"
         "metadata = load(policy._model, 'checkpoints/pi05_libero_expansion_v5_lora_v1/all/adapter.pt')\n```\n\n"
